@@ -1,0 +1,3 @@
+Use this file to specify how many project bucks you are spending.
+If you are working with a partner, you should specify whose account the bucks
+will be debited from (I recommend splitting it equally from each partner).
