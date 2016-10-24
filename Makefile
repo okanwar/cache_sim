@@ -1,4 +1,4 @@
-# Makefile for COMP280 Project 6
+# Makefile for COMP280 Project 5
  
 CC = gcc
 CFLAGS = -g -Wall -Werror -std=c11
