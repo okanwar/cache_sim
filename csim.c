@@ -6,6 +6,8 @@
  */
 #include "cachelab.h"
 
+typedef unsigned long int mem_addr;
+
 int main()
 {
     printSummary(0, 0, 0);
