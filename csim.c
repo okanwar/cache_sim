@@ -21,7 +21,7 @@ void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per
  * @param executable_name Strign containing the name of the executable.
  */
 void usage(char *executable_name) {
-	printf("%s -t <trace> -s <set bits> -E <lines per set> -b <block offset bits> [-v]", executable_name);
+	printf("Usage: %s [-hv] -s <s> -E <E> -b <b> -t <tracefile>", executable_name);
 }
 
 int main(int argc, char *argv[]) {
