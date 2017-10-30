@@ -34,6 +34,9 @@ int main(int argc, char *argv[]) {
 
 	// TODO: update this to support the h, b, and E options
 	int c = -1;
+
+	// Note: adding a colon after the letter states that this option should be
+	// followed by an additional value (e.g. "-s 1")
 	while ((c = getopt(argc, argv, "vs:t:")) != -1) {
 		switch (c) {
 			case 'v':
@@ -42,6 +45,8 @@ int main(int argc, char *argv[]) {
 				break;
 			case 's':
 				// specify the number of sets
+				// Note: optarg is set by getopt to the string that follows
+				// this option (e.g. "-s 2" would assign optarg to the string "2")
 				num_sets = 1 << strtol(optarg, NULL, 10);
 				break;
 			case 't':
