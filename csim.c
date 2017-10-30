@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 	
 	opterr = 0;
 
-	// TODO: update this to support the b and E options
+	// TODO: update this to support the h, b, and E options
 	int c = -1;
 	while ((c = getopt(argc, argv, "vs:t:")) != -1) {
 		switch (c) {
@@ -54,6 +54,10 @@ int main(int argc, char *argv[]) {
 				exit(1);
 		}
 	}
+
+	// TODO: When you are ready to start using the user defined options, you
+	// should add some code here that makes sure they have actually specified
+	// the options that are required (e.g. -t and -s are both required).
 
 	if (verbose_mode) {
 		printf("Verbose mode enabled.\n");
