@@ -26,6 +26,8 @@ void usage(char *executable_name) {
 
 int main(int argc, char *argv[]) {
 
+	int num_lines = 0;
+	int block_bits = 0;
 	int verbose_mode = 0;
 	int num_sets = 2;
 	char *trace_filename = NULL;
@@ -37,7 +39,7 @@ int main(int argc, char *argv[]) {
 
 	// Note: adding a colon after the letter states that this option should be
 	// followed by an additional value (e.g. "-s 1")
-	while ((c = getopt(argc, argv, "vs:t:")) != -1) {
+	while ((c = getopt(argc, argv, "vs:E:b:t:")) != -1) {
 		switch (c) {
 			case 'v':
 				// enable verbose mode
@@ -52,6 +54,12 @@ int main(int argc, char *argv[]) {
 			case 't':
 				// specify the trace filename
 				trace_filename = optarg;
+				break;
+			case 'E':
+				num_lines = 1 << strtol(optarg, NULL, 10);
+				break;
+			case 'b':
+				block_bits = 1 << strtol(optarg, NULL, 10);
 				break;
 			case '?':
 			default:
