@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "cachelab.h"
+#include <math.h>
 
 typedef unsigned long int mem_addr;
 
@@ -101,6 +102,20 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	int hit_count = 0;
 	int miss_count = 0;
 	int eviction_count = 0;
+	int addy = 0;
+	int set = 0;
+	int tag = 0;
+	char instruction;
+
+	FILE *trace_f;
+	trace_f = fopen(trace_file, "r");
+
+	while( fscanf(trace_f, "%c%d", &instruction, &addy) > 0){
+		addressCalc(addy, &tag, &set, block_size, 64, lines_per_set);
+
+		//Simulate Cache
+	}	
+
 
 	// TODO: This is where you will fill in the code to perform the actual
 	// cache simulation. Make sure you split your work into multiple functions
@@ -110,6 +125,8 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 }
 
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits, int set_bits) {
+	block_bits = log(block_bits) / log(2);
+	set_bits = log(set_bits) / log(2);
 	*set = ((addy << tag_bits) >> (tag_bits + block_bits));
 	*tag = (addy >> (set_bits + block_bits));
 }
