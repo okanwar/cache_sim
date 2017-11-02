@@ -110,6 +110,6 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 }
 
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits, int set_bits) {
-	set = ((addy << tag_bits) >> (tag_bits + block_bits));
-	tag = ((addt >> (set_bits + block_bits));
+	*set = ((addy << tag_bits) >> (tag_bits + block_bits));
+	*tag = (addy >> (set_bits + block_bits));
 }
