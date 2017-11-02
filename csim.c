@@ -14,7 +14,7 @@ typedef unsigned long int mem_addr;
 
 // forward declaration
 void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per_set, int verbose);
-
+void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits, int set_bits);
 /**
  * Prints out a reminder of how to run the program.
  *
@@ -107,4 +107,9 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	// so that each function is as simple as possible.
 
     printSummary(hit_count, miss_count, eviction_count);
+}
+
+void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits, int set_bits) {
+	set = ((addy << tag_bits) >> (tag_bits + block_bits));
+	tag = ((addt >> (set_bits + block_bits));
 }
