@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 		printf("Number of sets: %d\n", num_sets);
 	}
 
-	simulateCache(trace_filename, num_sets, 2, 1, verbose_mode);
+	simulateCache(trace_filename, num_sets, num_lines, block_bits, verbose_mode);
 
     return 0;
 }
