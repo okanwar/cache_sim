@@ -16,7 +16,7 @@ typedef unsigned long int mem_addr;
 // forward declaration
 void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per_set, int verbose);
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits, int set_bits);
-void updateLRU();
+void updateLRU(int *cache, int index, int mru, int lines_per_set);
 /**
  * Prints out a reminder of how to run the program.
  *
@@ -118,27 +118,27 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	while( fscanf(trace_f, "%c%d", &instruction, &addy) > 0){
 		addressCalc(addy, &tag, &set, block_size, 64, lines_per_set);
 
-		//Simulate Cache
+			//Simulate Cache
 		
-		//Iterates over the set the address is in cheching valid bit and tag
-		for( int i = (3 * set * lines_per_set); i < (3 * (set+1)* lines_per_set); i+=3 ){
+			//Iterates over the set the address is in cheching valid bit and tag
+			for( int i = (3 * set * lines_per_set); i < (3 * (set+1)* lines_per_set); i+=3 ){
 			
 			// i is valid bit index
 			// i+1 is tag index
 
-			if( cache[i] == 0 ){ //Store in cache if valid bit is not set
-				cache[i] = 1;
-				cache[i+1] = tag;
-				miss_count++;
-			} else if ( cache[i] == 1){ //Check tag if valid bit is set
-				if( cache[+1] == tag ){
+				if( cache[i] == 0 ) { //Store in cache if valid bit is not set
+					cache[i] = 1;
+					cache[i+1] = tag;
+					miss_count++;
+				}	
+				else if (cache[i] == 1){ //Check tag if valid bit is set
+					if(cache[+1] == tag ){
 					hit_count++;
+					}
 				}
-
 			}	
-		}
 
-		//Evicte lru 
+		//Evict LRU
 
 	}	
 
@@ -158,6 +158,13 @@ void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits
 }
 
 
-void updateLRU(){
-
+void updateLRU(int *cache,int index, int mru, int lines_per_set) {
+	for(int i = index; i < (lines_per_set * 3); i += 3) {
+		if(i == mru) {
+			cache[i] = 1;
+		}
+		else if(cache[i] != 4) {
+			cache[i] = cache[i] + 1;
+		}
+	}
 }
