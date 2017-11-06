@@ -103,9 +103,10 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	int hit_count = 0;
 	int miss_count = 0;
 	int eviction_count = 0;
-	int addy = 0;
+	//int addy = 0;
 	int set = 0;
 	int tag = 0;
+	/*
 	char instruction;
 	int *cache;
 	int tag_index = 0;
@@ -115,7 +116,7 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	FILE *trace_f;
 	trace_f = fopen(trace_file, "r");
 
-	while( fscanf(trace_f, "%c%d", &instruction, &addy) > 0){
+    while( fscanf(trace_f, "%c%d", &instruction, &addy) > 0){
 		addressCalc(addy, &tag, &set, block_size, 64, lines_per_set);
 
 			//Simulate Cache
@@ -146,15 +147,29 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	// TODO: This is where you will fill in the code to perform the actual
 	// cache simulation. Make sure you split your work into multiple functions
 	// so that each function is as simple as possible.
-
+*/
     printSummary(hit_count, miss_count, eviction_count);
+	addressCalc(58, &tag, &set, 8, 8, 4); //00111010
+	printf("set: %d tag: %d\n", set, tag);
+
 }
 
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits, int set_bits) {
 	block_bits = log(block_bits) / log(2);
 	set_bits = log(set_bits) / log(2);
-	*set = ((addy << tag_bits) >> (tag_bits + block_bits));
+	int mask;
 	*tag = (addy >> (set_bits + block_bits));
+	
+	if( set_bits == 0 ){
+		return;
+	}
+
+	mask = 0;
+	for(int i = 0; i < set_bits-1; i++){
+		mask |= (mask << 1);
+	}
+	printf("%d\n", mask);
+	*set = mask & (addy >> block_bits);
 }
 
 
