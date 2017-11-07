@@ -17,6 +17,7 @@ typedef unsigned long int mem_addr;
 void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per_set, int verbose);
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits, int set_bits);
 void updateLRU(int *cache, int index, int mru, int lines_per_set);
+int  findLRU(int *cache, int index, int lines_per_set);
 /**
  * Prints out a reminder of how to run the program.
  *
@@ -106,7 +107,8 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	int addy = 0;
 	int set = 0;
 	int tag = 0;
-	
+	int evict_num = 0;
+
 	char instruction;
 	int *cache;
 	int tag_index = 0;
@@ -131,15 +133,20 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 					cache[i] = 1;
 					cache[i+1] = tag;
 					miss_count++;
+					continue;
 				}	
 				else if (cache[i] == 1){ //Check tag if valid bit is set
 					if(cache[+1] == tag ){
 					hit_count++;
+					continue;
 					}
 				}
 			}	
 
 		//Evict LRU
+		evict_num = findLRU(*cache, set, lines_per_set);
+		updateLRU(cache, set_num, mru, lines_per_set);
+		miss_counter++;
 
 	}	
 
@@ -171,7 +178,6 @@ void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits
 	*set = mask & (addy >> block_bits);
 }
 
-
 void updateLRU(int *cache, int set_num, int mru, int lines_per_set) {
 	int index_LRU =  (3*(set_num*lines_per_set)) + 2;
 	int cache_index = 0;
@@ -185,3 +191,15 @@ void updateLRU(int *cache, int set_num, int mru, int lines_per_set) {
 		}
 	}
 }
+
+int findLRU(int *cache, int set_num, int lines_per_set) {
+	int index_LRU = (3*(set_num*lines_per_set)) + 2;
+	int cache_index = 0;
+	int num_LRU = index_LRU;
+	for(int i = 1; i <= lines_per_set; i++) {
+  		if(cache[index_LRU] < cache[num_LRU]) {
+	 		num_LRU = index_LRU;
+		}
+	}
+	return num_LRU;
+}	
