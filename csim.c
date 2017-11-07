@@ -108,7 +108,7 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	int set = 0;
 	int tag = 0;
 	int evict_num = 0;
-
+	int mru = 0;
 	char instruction;
 	int *cache;
 	int tag_index = 0;
@@ -145,8 +145,9 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 
 		//Evict LRU
 		evict_num = findLRU(*cache, set, lines_per_set);
-		updateLRU(cache, set_num, mru, lines_per_set);
-		miss_counter++;
+		mru = (evict_num - (3*(set*lines_per_set)));
+		updateLRU(cache, set, mru, lines_per_set);
+		miss_count++;
 
 	}	
 
