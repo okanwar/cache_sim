@@ -165,8 +165,8 @@ void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits
 	}
 
 	mask = 0;
-	for(int i = 0; i < set_bits-1; i++){
-		mask |= (mask << 1);
+	for(int i = 0; i < set_bits; i++){
+		mask |= (1 << i);
 	}
 	printf("%d\n", mask);
 	*set = mask & (addy >> block_bits);
