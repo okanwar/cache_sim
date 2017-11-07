@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-/**
+/*
  * Simulates cache with the specified organization (S, E, B) on the given
  * trace file.
  *
@@ -103,10 +103,10 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	int hit_count = 0;
 	int miss_count = 0;
 	int eviction_count = 0;
-	//int addy = 0;
+	int addy = 0;
 	int set = 0;
 	int tag = 0;
-	/*
+	
 	char instruction;
 	int *cache;
 	int tag_index = 0;
@@ -147,7 +147,7 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	// TODO: This is where you will fill in the code to perform the actual
 	// cache simulation. Make sure you split your work into multiple functions
 	// so that each function is as simple as possible.
-*/
+
     printSummary(hit_count, miss_count, eviction_count);
 	addressCalc(58, &tag, &set, 8, 8, 4); //00111010
 	printf("set: %d tag: %d\n", set, tag);
@@ -168,18 +168,20 @@ void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits
 	for(int i = 0; i < set_bits; i++){
 		mask |= (1 << i);
 	}
-	printf("%d\n", mask);
 	*set = mask & (addy >> block_bits);
 }
 
 
-void updateLRU(int *cache,int index, int mru, int lines_per_set) {
-	for(int i = index; i < (lines_per_set * 3); i += 3) {
-		if(i == mru) {
-			cache[i] = 1;
+void updateLRU(int *cache, int set_num, int mru, int lines_per_set) {
+	int index_LRU =  (3*(set_num*lines_per_set)) + 2;
+	for(int i = 1; i <= lines_per_set; i++) {
+		int cache_index;
+		if(i = mru) {
+			cache_index = (i*3) + index_LRU;
+			cache[cache_index] = 1;
 		}
-		else if(cache[i] != 4) {
-			cache[i] = cache[i] + 1;
+		else {
+			cache[cache_index]++;
 		}
 	}
 }
