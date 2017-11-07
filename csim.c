@@ -174,10 +174,10 @@ void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits
 
 void updateLRU(int *cache, int set_num, int mru, int lines_per_set) {
 	int index_LRU =  (3*(set_num*lines_per_set)) + 2;
+	int cache_index = 0;
 	for(int i = 1; i <= lines_per_set; i++) {
-		int cache_index;
+		cache_index = (i*3) + index_LRU;
 		if(i = mru) {
-			cache_index = (i*3) + index_LRU;
 			cache[cache_index] = 1;
 		}
 		else {
