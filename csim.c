@@ -216,7 +216,7 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits){
 	printf("evict at %d\n", lru_line);
 	//Found no open lines in set so evict lru
 	cache->sets[set_].lines[lru_line].tag = tag_;
-	//Update lru
+	updateLRU(cache, set_, lru_line);
 	//Update miss count
 	//update evict count
 
