@@ -42,11 +42,10 @@ typedef struct Cache Cache;
 // forward declaration
 void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per_set, int verbose);
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int set_bits);
-void updateLRU(int *cache, int index, int mru, int lines_per_set);
-int  findLRU(int *cache, int index, int lines_per_set);
 void verbosePrint( char op, int addy, int size, int resultCode);
 void initCache(Cache *cache, int num_sets, int lines_per_set);
 void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits);
+void updateLRU(Cache *cache, int set_num, int mru_line);
 
 
 /**
@@ -221,6 +220,19 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits){
 	//Update miss count
 	//update evict count
 
+}
+
+void updateLRU(Cache *cache, int set_num, int mru_line){
+	
+	//update lru values in set
+	for(int i=0; i < cache->sets[set_num].num_lines; i++){
+		
+		if(i == mru_line){//Found mru line
+			cache->sets[set_num].lines[i].lru_num = 0;
+		} else { //Increment lru_num
+			cache->sets[set_num].lines[i].lru_num++;
+		}
+	}
 }
 
 void initCache(Cache *cache, int num_sets, int lines_per_set){
