@@ -13,7 +13,6 @@
 
 typedef unsigned long int mem_addr;
 
-
 //Line struct
 struct Line{
 	int valid_bit;
@@ -130,16 +129,26 @@ int main(int argc, char *argv[]) {
  */
 void simulateCache(char *trace_file, int num_sets, int block_size, 
 						int lines_per_set, int verbose) {
+
 	// Variables to track how many hits, misses, and evictions we've had so
 	// far during simulation.
 	int hit_count = 0;
 	int miss_count = 0;
 	int eviction_count = 0;
+	mem_addr addy = 0;
+	int size = 0;
+	char instruct[10];
+	Cache cache;
+	initCache(&cache, num_sets, lines_per_set);
+	FILE *fp;
+	fp = fopen(trace_file, "r");
 
     printSummary(hit_count, miss_count, eviction_count);
 
+	while(fscanf(fp, "%s %lx, %d", instruct, &addy, &size) == 3) {
+		printf("instruct = %s current = %lx size = %d\n", instruct, addy, size);
+	}
 }
-
 
 void initCache(Cache *cache, int num_sets, int lines_per_set){
 	cache->num_sets = num_sets;
