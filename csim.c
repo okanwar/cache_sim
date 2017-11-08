@@ -13,12 +13,42 @@
 
 typedef unsigned long int mem_addr;
 
+
+//Line struct
+struct Line{
+	int valid_bit;
+	int tag;
+	int lru_num;
+};
+
+typedef struct Line Line;
+
+//Set struct
+struct Set{
+	int num_lines;
+	Line *lines;
+};
+
+typedef struct Set Set;
+
+//Cache struct
+struct Cache{
+	int num_sets;
+	Set *sets;
+};
+
+typedef struct Cache Cache;
+
+
 // forward declaration
 void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per_set, int verbose);
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits, int set_bits);
 void updateLRU(int *cache, int index, int mru, int lines_per_set);
 int  findLRU(int *cache, int index, int lines_per_set);
 void verbosePrint( char op, int addy, int size, int resultCode);
+void initCache(Cache *cache, int num_sets, int lines_per_set);
+
+
 /**
  * Prints out a reminder of how to run the program.
  *
@@ -108,6 +138,22 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 
     printSummary(hit_count, miss_count, eviction_count);
 
+}
+
+
+void initCache(Cache *cache, int num_sets, int lines_per_set){
+	cache->num_sets = num_sets;
+	cache->sets = calloc( num_sets, sizeof(Set) );
+
+	for(int i = 0; i < cache->num_sets; i++) { //Initializes sets
+		cache->sets[i].num_lines = lines_per_set;
+		cache->sets[i].lines = calloc( lines_per_set, sizeof(Line) );
+
+		for(int j = 0; j < cache->sets[j].num_lines; j++) { // Initialize lines in set
+			cache->sets[i].lines[j].valid_bit = 0;
+			cache->sets[i].lines[j].lru_num = (j+1);
+		}
+	}
 }
 
 void verbosePrint( char op, int addy, int size, int resultCode){
