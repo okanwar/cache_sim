@@ -111,9 +111,9 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	int mru = 0;
 	char instruction;
 	int *cache;
-	int tag_index = 0;
+	//int tag_index = 0;
 
-	cache = (int*)calloc( num_sets * lines_per_set * 2 , sizeof(int) );
+	cache = (int*)calloc( num_sets * lines_per_set * 3 , sizeof(int) );
 
 	FILE *trace_f;
 	trace_f = fopen(trace_file, "r");
@@ -122,7 +122,7 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 		addressCalc(addy, &tag, &set, block_size, 64, lines_per_set);
 
 			//Simulate Cache
-		
+			
 			//Iterates over the set the address is in cheching valid bit and tag
 			for( int i = (3 * set * lines_per_set); i < (3 * (set+1)* lines_per_set); i+=3 ){
 			
@@ -144,10 +144,11 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 			}	
 
 		//Evict LRU
-		evict_num = findLRU(*cache, set, lines_per_set);
-		mru = (evict_num - (3*(set*lines_per_set)));
+		evict_num = findLRU(cache, set, lines_per_set);
+		mru = ((evict_num - (3*(set*lines_per_set)))/ 3);
 		updateLRU(cache, set, mru, lines_per_set);
 		miss_count++;
+		eviction_count++;
 
 	}	
 
@@ -157,8 +158,6 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	// so that each function is as simple as possible.
 
     printSummary(hit_count, miss_count, eviction_count);
-	addressCalc(58, &tag, &set, 8, 8, 4); //00111010
-	printf("set: %d tag: %d\n", set, tag);
 
 }
 
@@ -184,7 +183,7 @@ void updateLRU(int *cache, int set_num, int mru, int lines_per_set) {
 	int cache_index = 0;
 	for(int i = 1; i <= lines_per_set; i++) {
 		cache_index = (i*3) + index_LRU;
-		if(i = mru) {
+		if(i == mru) {
 			cache[cache_index] = 1;
 		}
 		else {
@@ -195,7 +194,7 @@ void updateLRU(int *cache, int set_num, int mru, int lines_per_set) {
 
 int findLRU(int *cache, int set_num, int lines_per_set) {
 	int index_LRU = (3*(set_num*lines_per_set)) + 2;
-	int cache_index = 0;
+	//int cache_index = 0;
 	int num_LRU = index_LRU;
 	for(int i = 1; i <= lines_per_set; i++) {
   		if(cache[index_LRU] < cache[num_LRU]) {
