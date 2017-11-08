@@ -105,15 +105,6 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	int hit_count = 0;
 	int miss_count = 0;
 	int eviction_count = 0;
-	int addy = 0;
-	int set = 0;
-	int tag = 0;
-	int evict_num = 0;
-	int mru = 0;
-	char instruction;
-	int *cache;
-
-	
 
     printSummary(hit_count, miss_count, eviction_count);
 
