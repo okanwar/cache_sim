@@ -18,6 +18,7 @@ void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits, int set_bits);
 void updateLRU(int *cache, int index, int mru, int lines_per_set);
 int  findLRU(int *cache, int index, int lines_per_set);
+void verbosePrint( char op, int addy, int size, int resultCode);
 /**
  * Prints out a reminder of how to run the program.
  *
@@ -111,54 +112,31 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 	int mru = 0;
 	char instruction;
 	int *cache;
-	//int tag_index = 0;
 
-	cache = (int*)calloc( num_sets * lines_per_set * 3 , sizeof(int) );
-
-	FILE *trace_f;
-	trace_f = fopen(trace_file, "r");
-
-    while( fscanf(trace_f, "%c%d", &instruction, &addy) > 0){
-		addressCalc(addy, &tag, &set, block_size, 64, lines_per_set);
-
-			//Simulate Cache
-			
-			//Iterates over the set the address is in cheching valid bit and tag
-			for( int i = (3 * set * lines_per_set); i < (3 * (set+1)* lines_per_set); i+=3 ){
-			
-			// i is valid bit index
-			// i+1 is tag index
-
-				if( cache[i] == 0 ) { //Store in cache if valid bit is not set
-					cache[i] = 1;
-					cache[i+1] = tag;
-					miss_count++;
-					continue;
-				}	
-				else if (cache[i] == 1){ //Check tag if valid bit is set
-					if(cache[+1] == tag ){
-					hit_count++;
-					continue;
-					}
-				}
-			}	
-
-		//Evict LRU
-		evict_num = findLRU(cache, set, lines_per_set);
-		mru = ((evict_num - (3*(set*lines_per_set)))/ 3);
-		updateLRU(cache, set, mru, lines_per_set);
-		miss_count++;
-		eviction_count++;
-
-	}	
-
-
-	// TODO: This is where you will fill in the code to perform the actual
-	// cache simulation. Make sure you split your work into multiple functions
-	// so that each function is as simple as possible.
+	
 
     printSummary(hit_count, miss_count, eviction_count);
 
+}
+
+void verbosePrint( char op, int addy, int size, int resultCode){
+	char* result;
+
+	switch(resultCode){
+		case 1:
+			result = "miss";
+		case 2:
+			result = "hit";
+		case 3:
+			result = "miss eviction";
+		case 4:
+			result = "miss hit";
+		case 5:
+			result = "miss eviction hit";
+		default:
+			result = "NULL";
+	}
+	printf("%c %d,%d %s\n", op, addy, size, result);
 }
 
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits, int set_bits) {
@@ -178,28 +156,3 @@ void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int tag_bits
 	*set = mask & (addy >> block_bits);
 }
 
-void updateLRU(int *cache, int set_num, int mru, int lines_per_set) {
-	int index_LRU =  (3*(set_num*lines_per_set)) + 2;
-	int cache_index = 0;
-	for(int i = 1; i <= lines_per_set; i++) {
-		cache_index = (i*3) + index_LRU;
-		if(i == mru) {
-			cache[cache_index] = 1;
-		}
-		else {
-			cache[cache_index]++;
-		}
-	}
-}
-
-int findLRU(int *cache, int set_num, int lines_per_set) {
-	int index_LRU = (3*(set_num*lines_per_set)) + 2;
-	//int cache_index = 0;
-	int num_LRU = index_LRU;
-	for(int i = 1; i <= lines_per_set; i++) {
-  		if(cache[index_LRU] < cache[num_LRU]) {
-	 		num_LRU = index_LRU;
-		}
-	}
-	return num_LRU;
-}	
