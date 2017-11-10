@@ -203,7 +203,6 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 				//update hit count
 				*hit_count = *hit_count + 1;
 				printf("hit\n");
-				return;
 			}
 
 			//Track lru num
@@ -217,6 +216,7 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 
 			}
 
+			return;
 		}
 	}
 
