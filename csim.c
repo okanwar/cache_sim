@@ -198,9 +198,9 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, 
 			return;
 		}
 
-	}
+	
 
-	for(int i = 0; i < cache->sets[set_].num_lines; i++) { //iterate over lines in set
+	//for(int i = 0; i < cache->sets[set_].num_lines; i++) { //iterate over lines in set
 		
 		if( cache->sets[set_].lines[i].tag == tag_ ){ //tags match
 			*hit_count = *hit_count + 1;
