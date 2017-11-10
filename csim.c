@@ -85,7 +85,6 @@ int main(int argc, char *argv[]) {
 				num_sets = 1 << strtol(optarg, NULL, 10);
 				break;
 			case 'E':
-				// specify the trace filename
 				num_lines = strtol(optarg, NULL, 10);
 				break;
 			case 'b':
