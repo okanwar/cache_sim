@@ -181,56 +181,47 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, 
 	int lru_num = 0;
 	int lru_line = 0;
 	addressCalc( addy, &tag_, &set_, block_bits, num_sets);
-	printf("set:%d\n", set_);
-	
-	//Find address
-	for( int i = 0; i < cache->sets[set_].num_lines; i++ ){ //iterate over lines in set
-		
 
-		if( cache->sets[set_].lines[i].valid_bit == 0 ){
-			//Store in line i of set
+	for( int i = 0; i < cache->sets[set_].num_lines; i++ ) { //iterates over lines in set_
+		
+		if( cache->sets[set_].lines[i].valid_bit == 0 ){ //valid bit is 0
+			
 			cache->sets[set_].lines[i].valid_bit = 1;
 			cache->sets[set_].lines[i].tag = tag_;
-			//update miss count
 			*miss_count = *miss_count + 1;
-			updateLRU(cache, set_, i);
-			printf("miss valid bit set at %d in set %d\n", i, set_);
+			updateLRU( cache, set_, i);
 			return;
+
 		}
 
-	
-
-	//for(int i = 0; i < cache->sets[set_].num_lines; i++) { //iterate over lines in set
-		
-		if( cache->sets[set_].lines[i].tag == tag_ ){ //tags match
+		if( cache->sets[set_].lines[i].tag == tag_ ){ //valid bit is 1 check tags
+			
 			*hit_count = *hit_count + 1;
-			printf("hit\n");
 			return;
 		}
+
 	}
+
+	//Evict
 	
-	//set lru num to first lru num in set
+	//Find line to evict
 	lru_num = cache->sets[set_].lines[0].lru_num;
-		
-	for(int i =0; i < cache->sets[set_].num_lines; i++){ //iterate over lines in set
-		
-		//Check if any lru_num is greater
-		if( cache->sets[set_].lines[i].lru_num > lru_num ){ //found line used least recently
+	
+	//See if there is a least recently used line
+	for(int i = 0; i < cache->sets[set_].num_lines; i++ ){
+	
+		if( cache->sets[set_].lines[i].lru_num > lru_num ){
 			lru_num = cache->sets[set_].lines[i].lru_num;
 			lru_line = i;
+
 		}
-		
 	}
 
-	printf("evict at %d\n", lru_line);
-	//Found no open lines in set so evict lru
+	//Evict
 	cache->sets[set_].lines[lru_line].tag = tag_;
-	updateLRU(cache, set_, lru_line);
-	//Update miss count
-	//update evict count
+	updateLRU( cache, set_, lru_line);
 	*miss_count = *miss_count + 1;
-	*eviction_count = *eviction_count +1;
-	return;
+	*eviction_count = *eviction_count + 1;
 
 }
 
