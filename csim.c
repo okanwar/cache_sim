@@ -186,7 +186,7 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 	//Find address
 	for( int i = 0; i < cache->sets[set_].num_lines; i++ ){ //iterate over lines in set
 		
-		printf("%d\n", cache->sets[set_].num_lines);
+		//printf("%d\n", cache->sets[set_].num_lines);
 
 		if( cache->sets[set_].lines[i].valid_bit == 0 ){
 			//Store in line i of set
@@ -195,7 +195,7 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 			//update miss count
 			*miss_count = *miss_count + 1;
 			updateLRU(cache, set_, i);
-			printf("miss valid bit set at %d in set %d\n", i, set_);
+			//printf("miss valid bit set at %d in set %d\n", i, set_);
 			return;
 
 		} else { //valid bit = 1, check tags and lru if tags dont match
@@ -203,7 +203,7 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 			if( cache->sets[set_].lines[i].tag == tag_ ){ //Tags match, update hit and return
 				//update hit count
 				*hit_count = *hit_count + 1;
-				printf("hit\n");
+				//printf("hit\n");
 				return;
 			}
 
@@ -220,7 +220,7 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 
 		}
 	}
-	printf("evict at %d\n", lru_line);
+	//printf("evict at %d\n", lru_line);
 	//Found no open lines in set so evict lru
 	cache->sets[set_].lines[lru_line].tag = tag_;
 	updateLRU(cache, set_, lru_line);
