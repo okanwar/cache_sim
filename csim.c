@@ -41,7 +41,7 @@ typedef struct Cache Cache;
 
 // forward declaration
 void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per_set, int verbose);
-void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int set_bits);
+void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int num_sets);
 void verbosePrint( char op, int addy, int size, int resultCode);
 void initCache(Cache *cache, int num_sets, int lines_per_set);
 void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, int *hit_count, int *miss_count, int *eviction_count);
@@ -89,10 +89,10 @@ int main(int argc, char *argv[]) {
 				trace_filename = optarg;
 				break;
 			case 'E':
-				num_lines = 1 << strtol(optarg, NULL, 10);
+				num_lines = strtol(optarg, NULL, 10);
 				break;
 			case 'b':
-				block_bits = 1 << strtol(optarg, NULL, 10);
+				block_bits = strtol(optarg, NULL, 10);
 				break;
 			case '?':
 			default:
@@ -127,8 +127,7 @@ int main(int argc, char *argv[]) {
  * @param verbose Whether to print out extra information about what the
  *   simulator is doing (1 = yes, 0 = no).
  */
-void simulateCache(char *trace_file, int num_sets, int block_size, 
-						int lines_per_set, int verbose) {
+void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per_set, int verbose) {
 
 	// Variables to track how many hits, misses, and evictions we've had so
 	// far during simulation.
@@ -153,16 +152,16 @@ void simulateCache(char *trace_file, int num_sets, int block_size,
 			case 'I':
 				break;
 			case 'L':
-				trace(&cache, addy, size,block_size, lines_per_set, &hit_count, &miss_count, &eviction_count);
+				trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
 				break;
 			case 'S':
 				//test
-				trace(&cache, addy, size,block_size, lines_per_set, &hit_count, &miss_count, &eviction_count);
+				trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
 				break;
 			case 'M':
 				//test
-				trace(&cache, addy, size,block_size, lines_per_set, &hit_count, &miss_count, &eviction_count);
-				trace(&cache, addy, size,block_size, lines_per_set, &hit_count, &miss_count, &eviction_count);
+				trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
+				trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
 				break;
 			default:
 				break;
@@ -182,11 +181,11 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 	int lru_num = 0;
 	int lru_line = 0;
 	addressCalc( addy, &tag_, &set_, block_bits, set_bits);
+	printf("set:%d\n", set_);
 	
 	//Find address
 	for( int i = 0; i < cache->sets[set_].num_lines; i++ ){ //iterate over lines in set
 		
-		//printf("%d\n", cache->sets[set_].num_lines);
 
 		if( cache->sets[set_].lines[i].valid_bit == 0 ){
 			//Store in line i of set
@@ -195,7 +194,7 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 			//update miss count
 			*miss_count = *miss_count + 1;
 			updateLRU(cache, set_, i);
-			//printf("miss valid bit set at %d in set %d\n", i, set_);
+			printf("miss valid bit set at %d in set %d\n", i, set_);
 			return;
 
 		} else { //valid bit = 1, check tags and lru if tags dont match
@@ -203,7 +202,7 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 			if( cache->sets[set_].lines[i].tag == tag_ ){ //Tags match, update hit and return
 				//update hit count
 				*hit_count = *hit_count + 1;
-				//printf("hit\n");
+				printf("hit\n");
 				return;
 			}
 
@@ -220,7 +219,8 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 
 		}
 	}
-	//printf("evict at %d\n", lru_line);
+
+	printf("evict at %d\n", lru_line);
 	//Found no open lines in set so evict lru
 	cache->sets[set_].lines[lru_line].tag = tag_;
 	updateLRU(cache, set_, lru_line);
@@ -280,9 +280,8 @@ void verbosePrint( char op, int addy, int size, int resultCode){
 	printf("%c %d,%d %s\n", op, addy, size, result);
 }
 
-void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int set_bits) {
-	block_bits = log(block_bits) / log(2);
-	set_bits = log(set_bits) / log(2);
+void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int num_sets) {
+	int set_bits = log(num_sets) / log(2);
 	int mask;
 	*tag = (addy >> (set_bits + block_bits));
 	
