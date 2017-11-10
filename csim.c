@@ -84,15 +84,15 @@ int main(int argc, char *argv[]) {
 				// this option (e.g. "-s 2" would assign optarg to the string "2")
 				num_sets = 1 << strtol(optarg, NULL, 10);
 				break;
-			case 't':
-				// specify the trace filename
-				trace_filename = optarg;
-				break;
 			case 'E':
+				// specify the trace filename
 				num_lines = strtol(optarg, NULL, 10);
 				break;
 			case 'b':
 				block_bits = strtol(optarg, NULL, 10);
+				break;
+			case 't':
+				trace_filename = optarg;
 				break;
 			case '?':
 			default:
@@ -141,6 +141,7 @@ void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per
 	initCache(&cache, num_sets, lines_per_set);
 	FILE *fp;
 	fp = fopen(trace_file, "r");
+	printf("s:%d E:%d b%d\n)", num_sets, lines_per_set, block_size);
 
 
 	while(fscanf(fp, "%s %lx, %d", instruct, &addy, &size) == 3) {
@@ -155,7 +156,6 @@ void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per
 				trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
 				break;
 			case 'S':
-				//test
 				trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
 				break;
 			case 'M':
@@ -186,6 +186,7 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, 
 		
 		if( cache->sets[set_].lines[i].valid_bit == 0 ){ //valid bit is 0
 			
+			printf("miss (set:%d line:%d)\n", set_, i);
 			cache->sets[set_].lines[i].valid_bit = 1;
 			cache->sets[set_].lines[i].tag = tag_;
 			*miss_count = *miss_count + 1;
@@ -196,6 +197,7 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, 
 
 		if( cache->sets[set_].lines[i].tag == tag_ ){ //valid bit is 1 check tags
 			
+			printf("hit (set:%d line:%d)\n", set_, i);
 			*hit_count = *hit_count + 1;
 			return;
 		}
@@ -218,6 +220,7 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, 
 	}
 
 	//Evict
+	printf("miss evict (set:%d line:%d)\n", set_, lru_line);
 	cache->sets[set_].lines[lru_line].tag = tag_;
 	updateLRU( cache, set_, lru_line);
 	*miss_count = *miss_count + 1;
@@ -275,6 +278,7 @@ void verbosePrint( char op, int addy, int size, int resultCode){
 
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int num_sets) {
 	int set_bits = log(num_sets) / log(2);
+	//printf("block:%d set_bits:%d\n", block_bits, set_bits);
 	int mask;
 	*tag = (addy >> (set_bits + block_bits));
 	
@@ -287,5 +291,6 @@ void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int num_sets
 		mask |= (1 << i);
 	}
 	*set = mask & (addy >> block_bits);
+	//printf("Address calc: set:%d tag:%d\n", *set, *tag);
 }
 
