@@ -44,7 +44,7 @@ void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int num_sets);
 void verbosePrint( char op, int addy, int size, int resultCode);
 void initCache(Cache *cache, int num_sets, int lines_per_set);
-void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, int *hit_count, int *miss_count, int *eviction_count);
+void trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, int *hit_count, int *miss_count, int *eviction_count);
 void updateLRU(Cache *cache, int set_num, int mru_line);
 
 
@@ -173,14 +173,14 @@ void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per
     printSummary(hit_count, miss_count, eviction_count);
 }
 
-void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, int *hit_count, int *miss_count, int *eviction_count){
+void trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, int *hit_count, int *miss_count, int *eviction_count){
 	
 	//Calculate set and tag
 	int set_ = 0;
 	int tag_ = 0;
 	int lru_num = 0;
 	int lru_line = 0;
-	addressCalc( addy, &tag_, &set_, block_bits, set_bits);
+	addressCalc( addy, &tag_, &set_, block_bits, num_sets);
 	printf("set:%d\n", set_);
 	
 	//Find address
@@ -204,18 +204,20 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 		
 		if( cache->sets[set_].lines[i].tag == tag_ ){ //tags match
 			*hit_count = *hit_count + 1;
+			printf("hit\n");
 			return;
 		}
 	}
 	
 	//set lru num to first lru num in set
-	lru_num = cache->sets[set_].lines[1].lru_num;
+	lru_num = cache->sets[set_].lines[0].lru_num;
 		
 	for(int i =0; i < cache->sets[set_].num_lines; i++){ //iterate over lines in set
 		
 		//Check if any lru_num is greater
 		if( cache->sets[set_].lines[i].lru_num > lru_num ){ //found line used least recently
 			lru_num = cache->sets[set_].lines[i].lru_num;
+			lru_line = i;
 		}
 		
 	}
