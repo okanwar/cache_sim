@@ -196,28 +196,28 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int set_bits, 
 			updateLRU(cache, set_, i);
 			printf("miss valid bit set at %d in set %d\n", i, set_);
 			return;
+		}
 
-		} else { //valid bit = 1, check tags and lru if tags dont match
+	}
 
-			if( cache->sets[set_].lines[i].tag == tag_ ){ //Tags match, update hit and return
-				//update hit count
-				*hit_count = *hit_count + 1;
-				printf("hit\n");
-			}
-
-			//Track lru num
-			if(lru_num == 0){ //If lru has not been set
-				lru_num = cache->sets[set_].lines[i].lru_num;
-				lru_line = i;
-
-			} else if(lru_num < cache->sets[set_].lines[i].lru_num){ //This lines is the new lru
-				lru_num = cache->sets[set_].lines[i].lru_num;
-				lru_line = i;
-
-			}
-
+	for(int i = 0; i < cache->sets[set_].num_lines; i++) { //iterate over lines in set
+		
+		if( cache->sets[set_].lines[i].tag == tag_ ){ //tags match
+			*hit_count = *hit_count + 1;
 			return;
 		}
+	}
+	
+	//set lru num to first lru num in set
+	lru_num = cache->sets[set_].lines[1].lru_num;
+		
+	for(int i =0; i < cache->sets[set_].num_lines; i++){ //iterate over lines in set
+		
+		//Check if any lru_num is greater
+		if( cache->sets[set_].lines[i].lru_num > lru_num ){ //found line used least recently
+			lru_num = cache->sets[set_].lines[i].lru_num;
+		}
+		
 	}
 
 	printf("evict at %d\n", lru_line);
