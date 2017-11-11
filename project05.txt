@@ -1,10 +1,13 @@
 COMP 280 - Project 05 (Cache Simulator)
 
-1. Partner 1:
-   Partner 2:
+1. Partner 1: Om Kanwar
+   Partner 2: Michael Dana
 
-2. Total Hours Spent on Project:
+2. Total Hours Spent on Project: 10 hours
 
-3. Project Bucks Used:
+3. Project Bucks Used: 0
 
 5. (Optional) Additional Comments:
+	
+	The starter code was quite confusing and hard to follow. This caused some
+	unforseen time delays and frustrations.
