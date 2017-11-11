@@ -40,7 +40,7 @@ typedef struct Cache Cache;
 
 
 // forward declaration
-void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per_set, int verbose);
+void simulateCache(char *trace_file, int num_sets, int lines_per_set, int block_size, int verbose);
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int num_sets);
 void verbosePrint( char op, int addy, int size, int resultCode);
 void initCache(Cache *cache, int num_sets, int lines_per_set);
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
  * @param verbose Whether to print out extra information about what the
  *   simulator is doing (1 = yes, 0 = no).
  */
-void simulateCache(char *trace_file, int num_sets, int block_size, int lines_per_set, int verbose) {
+void simulateCache(char *trace_file, int num_sets, int lines_per_set, int block_size, int verbose) {
 
 	// Variables to track how many hits, misses, and evictions we've had so
 	// far during simulation.
