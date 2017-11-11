@@ -42,9 +42,9 @@ typedef struct Cache Cache;
 // forward declaration
 void simulateCache(char *trace_file, int num_sets, int lines_per_set, int block_size, int verbose);
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int num_sets);
-void verbosePrint( char op, int addy, int size, int resultCode);
+void verbosePrint( char op, mem_addr addy, int size, int resultCode);
 void initCache(Cache *cache, int num_sets, int lines_per_set);
-void trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, int *hit_count, int *miss_count, int *eviction_count);
+int trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, int *hit_count, int *miss_count, int *eviction_count);
 void updateLRU(Cache *cache, int set_num, int mru_line);
 
 
@@ -136,11 +136,12 @@ void simulateCache(char *trace_file, int num_sets, int lines_per_set, int block_
 	mem_addr addy = 0;
 	int size = 0;
 	char instruct[10];
+	int result_code = 0;
 	Cache cache;
 	initCache(&cache, num_sets, lines_per_set);
 	FILE *fp;
 	fp = fopen(trace_file, "r");
-	printf("s:%d E:%d b%d\n)", num_sets, lines_per_set, block_size);
+
 
 
 	while(fscanf(fp, "%s %lx, %d", instruct, &addy, &size) == 3) {
@@ -152,15 +153,36 @@ void simulateCache(char *trace_file, int num_sets, int lines_per_set, int block_
 			case 'I':
 				break;
 			case 'L':
-				trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
+				result_code = trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
+				if(verbose){
+					verbosePrint( instruct[0], addy, size, result_code);
+				}
 				break;
 			case 'S':
-				trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
+				result_code = trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
+				if(verbose){
+					verbosePrint( instruct[0], addy, size, result_code);
+				}
 				break;
 			case 'M':
 				//test
+				result_code = trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
 				trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
-				trace(&cache, addy, size,block_size, num_sets, &hit_count, &miss_count, &eviction_count);
+				if(verbose){	
+					switch (result_code){
+						case 1:
+							verbosePrint( instruct[0], addy, size, 4);
+							break;
+						case 2:
+							verbosePrint( instruct[0], addy, size, 6);
+							break;
+						case 3:
+							verbosePrint( instruct[0], addy, size, 5);
+							break;
+						default:
+							printf("default case\n");
+					}
+				}
 				break;
 			default:
 				break;
@@ -172,7 +194,7 @@ void simulateCache(char *trace_file, int num_sets, int lines_per_set, int block_
     printSummary(hit_count, miss_count, eviction_count);
 }
 
-void trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, int *hit_count, int *miss_count, int *eviction_count){
+int trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, int *hit_count, int *miss_count, int *eviction_count){
 	
 	//Calculate set and tag
 	int set_ = 0;
@@ -185,20 +207,18 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, 
 		
 		if( cache->sets[set_].lines[i].valid_bit == 0 ){ //valid bit is 0
 			
-			printf("miss (set:%d line:%d)\n", set_, i);
 			cache->sets[set_].lines[i].valid_bit = 1;
 			cache->sets[set_].lines[i].tag = tag_;
 			*miss_count = *miss_count + 1;
 			updateLRU( cache, set_, i);
-			return;
+			return 1;
 
 		}
 
 		if( cache->sets[set_].lines[i].tag == tag_ ){ //valid bit is 1 check tags
 			
-			printf("hit (set:%d line:%d)\n", set_, i);
 			*hit_count = *hit_count + 1;
-			return;
+			return 2;
 		}
 
 	}
@@ -219,11 +239,11 @@ void trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, 
 	}
 
 	//Evict
-	printf("miss evict (set:%d line:%d)\n", set_, lru_line);
 	cache->sets[set_].lines[lru_line].tag = tag_;
 	updateLRU( cache, set_, lru_line);
 	*miss_count = *miss_count + 1;
 	*eviction_count = *eviction_count + 1;
+	return 3;
 
 }
 
@@ -255,24 +275,31 @@ void initCache(Cache *cache, int num_sets, int lines_per_set){
 	}
 }
 
-void verbosePrint( char op, int addy, int size, int resultCode){
-	char* result;
+void verbosePrint( char op, mem_addr addy, int size, int resultCode){
 
 	switch(resultCode){
 		case 1:
-			result = "miss";
+			printf("%c %lu,%d miss\n", op, addy, size);
+			break;
 		case 2:
-			result = "hit";
+			printf("%c %lu,%d hit\n", op, addy, size);
+			break;
 		case 3:
-			result = "miss eviction";
+			printf("%c %lu,%d miss eviction\n", op, addy, size);
+			break;
 		case 4:
-			result = "miss hit";
+			printf("%c %lu,%d miss hit\n", op, addy, size);
+			break;
 		case 5:
-			result = "miss eviction hit";
+			printf("%c %lu,%d miss eviction hit\n", op, addy, size);
+			break;
+		case 6:
+			printf("%c %lu,%d hit hit\n", op, addy, size);
+			break;
 		default:
-			result = "NULL";
+			printf("NULL Verbose\n");
+			break;
 	}
-	printf("%c %d,%d %s\n", op, addy, size, result);
 }
 
 void addressCalc(mem_addr addy, int *tag, int *set, int block_bits, int num_sets) {
