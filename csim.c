@@ -192,7 +192,12 @@ void simulateCache(char *trace_file, int num_sets, int lines_per_set, int block_
 	}
 
     printSummary(hit_count, miss_count, eviction_count);
+	
+
 }
+
+
+
 
 int trace(Cache *cache, mem_addr addy, int size, int block_bits, int num_sets, int *hit_count, int *miss_count, int *eviction_count){
 	
