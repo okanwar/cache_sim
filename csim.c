@@ -279,22 +279,22 @@ void verbosePrint( char op, mem_addr addy, int size, int resultCode){
 
 	switch(resultCode){
 		case 1:
-			printf("%c %lu,%d miss\n", op, addy, size);
+			printf("%c %lx,%d miss\n", op, addy, size);
 			break;
 		case 2:
-			printf("%c %lu,%d hit\n", op, addy, size);
+			printf("%c %lx,%d hit\n", op, addy, size);
 			break;
 		case 3:
-			printf("%c %lu,%d miss eviction\n", op, addy, size);
+			printf("%c %lx,%d miss eviction\n", op, addy, size);
 			break;
 		case 4:
-			printf("%c %lu,%d miss hit\n", op, addy, size);
+			printf("%c %lx,%d miss hit\n", op, addy, size);
 			break;
 		case 5:
-			printf("%c %lu,%d miss eviction hit\n", op, addy, size);
+			printf("%c %lx,%d miss eviction hit\n", op, addy, size);
 			break;
 		case 6:
-			printf("%c %lu,%d hit hit\n", op, addy, size);
+			printf("%c %lx,%d hit hit\n", op, addy, size);
 			break;
 		default:
 			printf("NULL Verbose\n");
