@@ -192,7 +192,6 @@ void simulateCache(char *trace_file, int num_sets, int lines_per_set, int block_
 	}
 
     printSummary(hit_count, miss_count, eviction_count);
-	
 
 }
 
